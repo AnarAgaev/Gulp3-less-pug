@@ -1,1 +1,1 @@
-# gulp-template
+My base template for gulp with less

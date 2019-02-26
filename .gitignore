@@ -3,3 +3,6 @@
 
 #Ignore preproduction directories
 /web/
+
+#Ignore package-lock
+package-lock.json
