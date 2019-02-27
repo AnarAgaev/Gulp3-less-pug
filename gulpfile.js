@@ -1,20 +1,30 @@
-// CONNECTING GULP MODULES
-const gulp = require('gulp')
-const less = require('gulp-less')
-const concat = require('gulp-concat')
-const sourcemaps = require('gulp-sourcemaps')
-const autoprefixer = require('gulp-autoprefixer')
-const cleanCss = require('gulp-clean-css')
-const cleanhtml = require('gulp-cleanhtml')
-const imagemin = require('gulp-imagemin')
-const browserSync = require('browser-sync').create()
+// PACKAGE CONNECTION
+const gulp          = require('gulp')
+const less          = require('gulp-less')
+const concat        = require('gulp-concat')
+const sourcemaps    = require('gulp-sourcemaps')
+const autoprefixer  = require('gulp-autoprefixer')
+const cleanCss      = require('gulp-clean-css')
+const cleanhtml     = require('gulp-cleanhtml')
+const imagemin      = require('gulp-imagemin')
+const plumber       = require('gulp-plumber')
+const notify        = require('gulp-notify')
+const browserSync   = require('browser-sync').create()
 
-// GULP TASKS
+// TASKS FOR GULP
 gulp.task('less', function () {
     return gulp.src([
       'src/less/main.less',
       'src/less/media.less'
     ])
+        .pipe(plumber({
+            errorHandler: notify.onError( function(err){
+                return {
+                    title: 'Styles',
+                    message: err.message
+                }
+            })
+        }))
         .pipe(sourcemaps.init())
         .pipe(less())
         .pipe(concat('style.css'))
@@ -24,14 +34,14 @@ gulp.task('less', function () {
         }))
         .pipe(cleanCss())
         .pipe(sourcemaps.write('../maps'))
+        .pipe(plumber.stop())
         .pipe(gulp.dest('web/style'))
         .pipe(browserSync.stream())
 })
 
 gulp.task('resetcss', function () {
-    return gulp.src(['src/less/reset.less'])
+    return gulp.src(['src/less/reset.css'])
         .pipe(sourcemaps.init())
-        .pipe(less())
         .pipe(autoprefixer({
             browsers: ['last 2 versions'],
             cascade: false
@@ -64,7 +74,7 @@ gulp.task('imagemin', function () {
         .pipe(browserSync.stream())
 })
 
-gulp.task('serve', function () {
+gulp.task('serve', ['less', 'resetcss', 'html', 'js', 'imagemin'], function () {
     browserSync.init({
         server: {
             baseDir: './web'
@@ -77,4 +87,4 @@ gulp.task('serve', function () {
     gulp.watch('src/img/**/*', ['imagemin'])
 })
 
-gulp.task('default', ['less', 'resetcss', 'html', 'js', 'imagemin', 'serve'])
+gulp.task('default', ['serve'])
