@@ -81,7 +81,7 @@ gulp.task('serve', ['less', 'resetcss', 'html', 'js', 'imagemin'], function () {
         }
     })
     gulp.watch('src/less/**/*.less', ['less'])
-    gulp.watch('src/less/reset.less', ['resetcss'])
+    gulp.watch('src/less/reset.css', ['resetcss'])
     gulp.watch('src/*.html', ['html'])
     gulp.watch('src/js/**/*.js', ['js'])
     gulp.watch('src/img/**/*', ['imagemin'])

@@ -1,8 +1,8 @@
 #Ignore Node modules
-/node_modules/
+/node_modules/**/*
 
 #Ignore preproduction directories
-/web/
+/web/**/*
 
 #Ignore package-lock
 package-lock.json
