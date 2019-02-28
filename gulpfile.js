@@ -10,6 +10,9 @@ const imagemin      = require('gulp-imagemin')
 const plumber       = require('gulp-plumber')
 const notify        = require('gulp-notify')
 const browserSync   = require('browser-sync').create()
+const pug           = require('gulp-pug')
+const del           = require('del')
+const runSequence   = require('run-sequence')
 
 // TASKS FOR GULP
 gulp.task('less', function () {
@@ -52,13 +55,22 @@ gulp.task('resetcss', function () {
         .pipe(browserSync.stream())
 })
 
-gulp.task('html', function () {
-    return gulp.src('src/*.html')
-        .pipe(sourcemaps.init())
-        .pipe(cleanhtml())
-        .pipe(sourcemaps.write('./maps'))
-        .pipe(gulp.dest('web'))
-        .pipe(browserSync.stream())
+gulp.task('pug', function() {
+  return gulp.src('./src/pug/pages/**/*.pug')
+      .pipe(plumber({
+          errorHandler: notify.onError( function(err){
+              return {
+                  title: 'Pug',
+                  message: err.message
+              }
+          })
+      }))
+    .pipe(pug({
+        pretty: true
+    }))
+    .pipe(plumber.stop())
+    .pipe(gulp.dest('web'))
+    .pipe(browserSync.stream())
 })
 
 gulp.task('js', function () {
@@ -74,7 +86,7 @@ gulp.task('imagemin', function () {
         .pipe(browserSync.stream())
 })
 
-gulp.task('serve', ['less', 'resetcss', 'html', 'js', 'imagemin'], function () {
+gulp.task('serve', ['less', 'resetcss', 'pug', 'js', 'imagemin'], function () {
     browserSync.init({
         server: {
             baseDir: './web'
@@ -82,7 +94,7 @@ gulp.task('serve', ['less', 'resetcss', 'html', 'js', 'imagemin'], function () {
     })
     gulp.watch('src/less/**/*.less', ['less'])
     gulp.watch('src/less/reset.css', ['resetcss'])
-    gulp.watch('src/*.html', ['html'])
+    gulp.watch('src/pug/pages/**/*.pug', ['pug'])
     gulp.watch('src/js/**/*.js', ['js'])
     gulp.watch('src/img/**/*', ['imagemin'])
 })
