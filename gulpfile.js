@@ -15,6 +15,10 @@ const del           = require('del')
 const runSequence   = require('run-sequence')
 
 // TASKS FOR GULP
+gulp.task('clean:basedir', function () {
+  return del('web')
+})
+
 gulp.task('less', function () {
     return gulp.src([
       'src/less/main.less',
@@ -78,14 +82,7 @@ gulp.task('copy:js', function () {
         .pipe(browserSync.stream())
 })
 
-gulp.task('copy:img', function () {
-    return gulp.src('src/img/**/*')
-        .pipe(imagemin())
-        .pipe(gulp.dest('web/images'))
-        .pipe(browserSync.stream())
-})
-
-gulp.task('serve', ['less', 'copy:resetcss', 'pug', 'copy:js', 'copy:img'], function () {
+gulp.task('server', function () {
     browserSync.init({
         server: {
             baseDir: './web'
@@ -95,7 +92,13 @@ gulp.task('serve', ['less', 'copy:resetcss', 'pug', 'copy:js', 'copy:img'], func
     gulp.watch('src/less/reset.css', ['copy:resetcss'])
     gulp.watch('src/pug/pages/**/*.pug', ['pug'])
     gulp.watch('src/js/**/*.js', ['copy:js'])
-    gulp.watch('src/img/**/*', ['copy:img'])
 })
 
-gulp.task('default', ['serve'])
+gulp.task('default', function(callback){
+    runSequence(
+        'clean:basedir',
+        ['less', 'copy:resetcss', 'pug', 'copy:js'],
+        'server',
+        callback
+    )
+})
